@@ -1,3 +1,4 @@
+import { MAX_IMAGES_UPLOAD } from "@/contants";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Upload } from "lucide-react";
 import * as React from "react";
@@ -115,7 +116,7 @@ export default function ImageUploader({ form }: FormProps) {
   };
 
   const images = form.watch("images");
-  const canAddMoreImages = images.length < 3;
+  const canAddMoreImages = images.length < MAX_IMAGES_UPLOAD;
 
   return (
     <>
@@ -126,7 +127,8 @@ export default function ImageUploader({ form }: FormProps) {
           <FormItem>
             <FormLabel>Images</FormLabel>
             <FormDescription>
-              Add up to 3 images. Images will be cropped to a square format.
+              Add up to {MAX_IMAGES_UPLOAD} images. Images will be cropped to a
+              square format.
             </FormDescription>
             {canAddMoreImages && (
               <div className="space-y-4">

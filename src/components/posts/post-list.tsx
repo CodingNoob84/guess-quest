@@ -1,4 +1,5 @@
 "use client";
+import { INITIAL_ITEMS, LOADMORE } from "@/contants";
 import { usePaginatedQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { PostCard } from "./post-card";
@@ -11,7 +12,7 @@ export const PostList = () => {
   } = usePaginatedQuery(
     api.posts.getAllPostsWithAnswers,
     {},
-    { initialNumItems: 2 }
+    { initialNumItems: INITIAL_ITEMS }
   );
 
   if (status === "LoadingFirstPage") {
@@ -34,7 +35,7 @@ export const PostList = () => {
       <div className="flex justify-center items-center">
         {status === "CanLoadMore" && (
           <button
-            onClick={() => loadMore(5)}
+            onClick={() => loadMore(LOADMORE)}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
           >
             Load More

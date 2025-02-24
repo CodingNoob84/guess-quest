@@ -1,3 +1,4 @@
+import { ATTEMPTS_OVER, MAX_ATTEMPTS, SUCCESS_MSG } from "@/contants";
 import { useToast } from "@/hooks/use-toast"; // Import toast hook
 import { cn, isAcceptableAnswer } from "@/lib/utils";
 import { useMutation } from "convex/react";
@@ -8,10 +9,6 @@ import { Id } from "../../../convex/_generated/dataModel";
 import { Answer } from "../../../convex/posts";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-
-const MAX_ATTEMPTS = 3;
-const SUCCESS_MSG = "🎉 You got it right! 🎯";
-const ATTEMPTS_OVER = "😢 Better Luck Next Time! 🍀";
 
 export const GuessInput = ({
   postId,
