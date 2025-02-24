@@ -95,6 +95,9 @@ export default function ImageUploader({ form }: FormProps) {
       setImageToEdit(null);
       setCurrentImageUrl("");
     } catch (error) {
+      setCropModalOpen(false);
+      setImageToEdit(null);
+      setCurrentImageUrl("");
       console.error("Error creating cropped image:", error);
       toast({
         title: "Error",
@@ -200,7 +203,7 @@ export default function ImageUploader({ form }: FormProps) {
             <DialogTitle>Crop Image</DialogTitle>
           </DialogHeader>
           {imageToEdit && (
-            <div className="relative w-full h-[400px]">
+            <div className="relative w-full h-[300px]">
               <Cropper
                 image={imageToEdit}
                 crop={crop}

@@ -11,7 +11,7 @@ import { VerifyBadge } from "./verify-badge";
 
 export function PostCard({ post }: { post: getAllPostWithAnswersTypes }) {
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-md w-full mx-auto mb-6">
+    <div className="bg-white rounded-lg shadow-2xl overflow-hidden max-w-md w-full mx-auto mb-6 border border-gray-200">
       <div className="p-4 space-y-4">
         {/* User Info Row */}
         <div className="flex items-center justify-between">
@@ -25,7 +25,7 @@ export function PostCard({ post }: { post: getAllPostWithAnswersTypes }) {
               <p className="text-xs text-gray-500">{post.user?.email}</p>
             </div>
           </div>
-          <VerifyBadge isVerified={post.isVerified} />
+          <VerifyBadge postId={post._id} isVerified={post.isVerified} />
         </div>
 
         <div className="flex flex-row gap-2">
@@ -46,13 +46,13 @@ export function PostCard({ post }: { post: getAllPostWithAnswersTypes }) {
           {post.images.map((image, index) => (
             <div
               key={index}
-              className="w-28 h-28 relative overflow-hidden rounded-md"
+              className="w-24 h-24 relative overflow-hidden rounded-md"
             >
               <Image
                 src={image.imageUrl || ""}
                 alt={`Scene ${index + 1}`}
-                width={128} // Fixed width
-                height={128} // Fixed height
+                width={100} // Fixed width
+                height={100} // Fixed height
                 className="object-cover rounded-md"
               />
             </div>

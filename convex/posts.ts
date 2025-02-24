@@ -1,8 +1,8 @@
-import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { Id } from "./_generated/dataModel";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
+import { v } from "convex/values";
+import { Id } from "./_generated/dataModel";
+import { mutation, query } from "./_generated/server";
 
 export const createPost = mutation({
   args: {
@@ -70,7 +70,6 @@ export type Post = {
   isVerified: boolean;
 };
 
-
 export type Answer = {
   _id: Id<"answers">; // Unique ID of the answer
   postId: Id<"posts">; // Associated post ID
@@ -89,8 +88,6 @@ export type getAllPostWithAnswersTypes = Post & {
   useranswers: Answer | null;
 };
 
-
-
 export const submitAnswer = mutation({
   args: {
     postId: v.id("posts"),
@@ -106,11 +103,13 @@ export const submitAnswer = mutation({
     // Check if the user already has an entry for this post
     const existingAnswer = await ctx.db
       .query("answers")
-      .withIndex("by_post_user", (q) => q.eq("postId", postId).eq("userId", userId))
+      .withIndex("by_post_user", (q) =>
+        q.eq("postId", postId).eq("userId", userId)
+      )
       .first(); // Get the latest attempt
 
-    let attemptNumber =1;
-    
+    let attemptNumber = 1;
+
     if (existingAnswer) {
       // If answer exists, update it by appending the new answer
       attemptNumber = existingAnswer.attempts + 1;
@@ -137,8 +136,12 @@ export const submitAnswer = mutation({
 
     // Update successCount or failureCount in posts table
     await ctx.db.patch(postId, {
-      successCount: isAnswered ? (post.successCount || 0) + 1 : post.successCount,
-      failureCount: !isAnswered ? (post.failureCount || 0) + 1 : post.failureCount,
+      successCount: isAnswered
+        ? (post.successCount || 0) + 1
+        : post.successCount,
+      failureCount: !isAnswered
+        ? (post.failureCount || 0) + 1
+        : post.failureCount,
     });
 
     return {
@@ -150,22 +153,34 @@ export const submitAnswer = mutation({
   },
 });
 
-export type getAllPostWithAnswersResponse = PaginationResult<getAllPostWithAnswersTypes>;
+export type getAllPostWithAnswersResponse =
+  PaginationResult<getAllPostWithAnswersTypes>;
 
 export const getAllPostsWithAnswers = query({
-  args: { paginationOpts: paginationOptsValidator  },
-  handler: async (ctx, { paginationOpts }): Promise<getAllPostWithAnswersResponse> => {
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (
+    ctx,
+    { paginationOpts }
+  ): Promise<getAllPostWithAnswersResponse> => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) return { page: [], continueCursor:"", isDone:true }; // Return empty pagination if not authenticated
+    if (!userId) return { page: [], continueCursor: "", isDone: true }; // Return empty pagination if not authenticated
 
     // Fetch paginated posts (ordered by latest first)
-    const postsPage = await ctx.db.query("posts").order("desc").paginate(paginationOpts);
+    const postsPage = await ctx.db
+      .query("posts")
+      .order("desc")
+      .paginate(paginationOpts);
 
-    if (!postsPage.page.length) return { page: [], continueCursor:"", isDone:true }; // Return if no posts exist
+    if (!postsPage.page.length)
+      return { page: [], continueCursor: "", isDone: true }; // Return if no posts exist
 
     // Fetch unique users to avoid redundant lookups
-    const uniqueUserIds = [...new Set(postsPage.page.map((post) => post.userId))];
-    const userRecords: (User | null)[] = await Promise.all(uniqueUserIds.map((id) => ctx.db.get(id)));
+    const uniqueUserIds = [
+      ...new Set(postsPage.page.map((post) => post.userId)),
+    ];
+    const userRecords: (User | null)[] = await Promise.all(
+      uniqueUserIds.map((id) => ctx.db.get(id))
+    );
 
     // Create a lookup map for user details
     const userMap: Record<string, User | null> = Object.fromEntries(
@@ -192,6 +207,30 @@ export const getAllPostsWithAnswers = query({
         user: userMap[post.userId] || null, // Attach post owner details
         useranswers: answerMap[post._id] || null, // Attach user’s answer history
       })),
+    };
+  },
+});
+
+export const updateVerified = mutation({
+  args: { postId: v.id("posts"), isVerified: v.boolean() },
+  handler: async (ctx, { postId, isVerified }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Unauthorized: User must be logged in to verify posts.");
+    }
+
+    // Fetch the user to check their role
+    const user = await ctx.db.get(userId);
+    if (!user || user.role !== "admin") {
+      throw new Error("Unauthorized: Only admins can verify posts.");
+    }
+
+    // Update the `isVerified` field in the `posts` table
+    await ctx.db.patch(postId, { isVerified });
+
+    return {
+      success: true,
+      message: `Post ${isVerified ? "verified" : "unverified"} successfully.`,
     };
   },
 });
