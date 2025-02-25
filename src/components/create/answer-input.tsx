@@ -1,15 +1,14 @@
-import * as React from "react";
 import {
+  FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
 import { X } from "lucide-react";
+import * as React from "react";
 import { FormProps } from "./form-post";
 
 export default function AnswerInput({ form }: FormProps) {
@@ -18,22 +17,22 @@ export default function AnswerInput({ form }: FormProps) {
   const getAnswerDescription = (type: string) => {
     switch (type) {
       case "moviename":
-        return "Enter movie name as your answer. Also add few possible misspelled answers";
+        return "Enter movie name as your answer. Also add a few possible misspelled answers";
       case "personname":
-        return "Enter person name as your answer. Also add few possible misspelled answers";
+        return "Enter person name as your answer. Also add a few possible misspelled answers";
       case "word":
-        return "Enter word as your answer. Also add few possible misspelled answers";
+        return "Enter word as your answer. Also add a few possible misspelled answers";
       default:
         return "Enter your answers";
     }
   };
 
-  const addAnswer = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && currentAnswer.trim()) {
-      e.preventDefault();
+  const addAnswer = () => {
+    const trimmedAnswer = currentAnswer.trim();
+    if (trimmedAnswer) {
       const answers = form.getValues("answers");
-      if (!answers.includes(currentAnswer.trim())) {
-        form.setValue("answers", [...answers, currentAnswer.trim()]);
+      if (!answers.includes(trimmedAnswer)) {
+        form.setValue("answers", [...answers, trimmedAnswer]);
         setCurrentAnswer("");
       }
     }
@@ -54,7 +53,20 @@ export default function AnswerInput({ form }: FormProps) {
               placeholder="Type and press Enter to add"
               value={currentAnswer}
               onChange={(e) => setCurrentAnswer(e.target.value)}
-              onKeyDown={addAnswer}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addAnswer();
+                }
+              }}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addAnswer();
+                }
+              }}
+              onBlur={addAnswer} // Ensures input is added when focus is lost (for mobile users)
+              enterKeyHint="done" // Improves mobile keyboard UX
             />
           </FormControl>
           <div className="flex flex-wrap gap-2 pt-2">

@@ -19,6 +19,14 @@ export const metadata: Metadata = {
   title: "Guess Quest",
   description:
     "A fun and interactive game where users guess words, movie names, or famous people based on pictures! 🎯🎨",
+  icons: {
+    icon: [
+      { rel: "icon", url: "/favicon.ico", sizes: "any" },
+      { rel: "icon", url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: { url: "/apple-touch-icon.png" },
+    other: [{ rel: "manifest", url: "/manifest.webmanifest" }],
+  },
 };
 
 export default function RootLayout({

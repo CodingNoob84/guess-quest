@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { api } from "../../../convex/_generated/api";
@@ -61,7 +62,7 @@ export default function CreatePostForm() {
   };
 
   const onSubmit = async (values: createPostFormSchema) => {
-    console.log("values", values);
+    //console.log("values", values);
     try {
       const storageIds = await Promise.all(
         values.images.map(async (image) => {
@@ -69,9 +70,9 @@ export default function CreatePostForm() {
         })
       );
 
-      console.log("Storage IDs:", storageIds);
+      //console.log("Storage IDs:", storageIds);
       const updatedImages = await getImageUrls({ storageIds });
-      console.log("updatedimages", updatedImages);
+      //console.log("updatedimages", updatedImages);
       const postData = {
         ...values,
         images: updatedImages,
@@ -96,6 +97,22 @@ export default function CreatePostForm() {
     } finally {
     }
   };
+
+  const type = form.watch("type");
+
+  useEffect(() => {
+    let newTag = "";
+    if (type === "moviename") {
+      newTag = "moviename";
+    } else if (type === "personname") {
+      newTag = "personname";
+    } else if (type === "word") {
+      newTag = "word";
+    }
+    if (newTag) {
+      form.setValue("tags", [newTag]);
+    }
+  }, [type, form]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-rose-50 to-teal-50 p-4 md:p-6">

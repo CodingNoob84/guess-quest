@@ -1,27 +1,26 @@
-import * as React from "react";
 import {
+  FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
 import { X } from "lucide-react";
+import * as React from "react";
 import { FormProps } from "./form-post";
 
 export default function TagInput({ form }: FormProps) {
   const [currentTag, setCurrentTag] = React.useState("");
 
-  const addTag = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && currentTag.trim()) {
-      e.preventDefault();
+  const addTag = () => {
+    const trimmedTag = currentTag.trim();
+    if (trimmedTag) {
       const tags = form.getValues("tags");
-      if (!tags.includes(currentTag.trim())) {
-        form.setValue("tags", [...tags, currentTag.trim()]);
-        setCurrentTag("");
+      if (!tags.includes(trimmedTag)) {
+        form.setValue("tags", [...tags, trimmedTag]);
+        setCurrentTag(""); // Clear input after adding
       }
     }
   };
@@ -41,7 +40,20 @@ export default function TagInput({ form }: FormProps) {
               placeholder="Type and press Enter to add tags"
               value={currentTag}
               onChange={(e) => setCurrentTag(e.target.value)}
-              onKeyDown={addTag}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addTag();
+                }
+              }}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addTag();
+                }
+              }}
+              onBlur={addTag} // Adds tag when user taps outside (for mobile users)
+              enterKeyHint="done" // Optimizes mobile keyboard UX
             />
           </FormControl>
           <div className="flex flex-wrap gap-2 pt-2">
